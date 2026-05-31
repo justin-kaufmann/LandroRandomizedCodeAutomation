@@ -1,0 +1,12 @@
+## Interface: 120005
+## Title: Landro Longshot Randomized Code Automation
+## Author: Justin Kaufmann
+## Version: 1.0
+## Notes: Landro Longshot Redemption Assistant
+## SavedVariables: LLRCA_DB
+
+Localization.lua
+Config.lua
+UI.lua
+Minimap.lua
+LandroRandomizedCodeAutomation.lua
