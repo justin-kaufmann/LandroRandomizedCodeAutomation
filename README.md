@@ -9,11 +9,14 @@ Automate repetitive code workflows for Landro Longshot with configurable NPC men
 # Features
 
 * Generate unique random codes automatically
+* Configurable code length (5–50 characters)
 * Configurable NPC menu navigation through a simple UI
 * Assisted code entry workflow
 * View current, next, and previously used codes
+* Copy current and previous codes directly from the addon interface
 * Persistent settings (saved between reloads and logins)
 * Start / Stop controls
+* Draggable window with ESC support
 * Minimap button access
 * Localization support
 
@@ -32,6 +35,18 @@ Configure the addon.
 ### Number of Codes
 
 Choose how many random codes should be generated and processed.
+
+### Code Length
+
+Choose the length of each generated random code.
+
+Supported range:
+
+**5–50 characters**
+
+The default value is:
+
+**25 characters**
 
 ### NPC Menu Configuration
 
@@ -81,8 +96,9 @@ The addon will then:
 
 * Navigate through configured menu entries
 * Generate unique random codes
-* Insert generated codes automatically
+* Automatically insert the generated code
 * Display workflow progress
+* Allow copying the current and previously generated codes
 
 ## Step 5
 
@@ -96,13 +112,11 @@ The addon requires manual re-interaction with Landro Longshot between iterations
 
 # Code Generation
 
-Generated codes currently use:
+Generated code length is configurable between **5** and **50** characters.
+
+Default:
 
 **25 characters**
-
-Every generated code is unique within the current session.
-
-Future versions may introduce configurable code lengths because TCG code formats may vary.
 
 ---
 
@@ -110,10 +124,12 @@ Future versions may introduce configurable code lengths because TCG code formats
 
 The addon displays:
 
+* Current status
 * Current progress
 * Current code index
 * Next generated code
 * Previously used code
+* Copy buttons for current and previous codes
 * Current required action
 
 ---
@@ -121,3 +137,7 @@ The addon displays:
 # Notes
 
 This addon is designed to reduce repetitive manual interaction during repeated Landro Longshot code workflows while still requiring player interaction between iterations.
+
+The addon window can be closed using the ESC key.
+
+The copy window automatically selects the displayed code, allowing it to be copied immediately using **CTRL+C**.
