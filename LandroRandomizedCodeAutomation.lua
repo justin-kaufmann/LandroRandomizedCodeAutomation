@@ -1,584 +1,301 @@
 local addonName = ...
 
-local Codes={}
+local Codes = {}
 
-local UsedCodes={}
+local UsedCodes = {}
 
-local State=
-{
+local State = {
 
-running=false,
+	running = false,
 
-current=1,
+	current = 1,
 
-total=0,
+	total = 0,
 
-lastCode=nil
-
+	lastCode = nil,
 }
 local popupOpen = false
 
+LLRCA_CurrentCode = nil
+
+LLRCA_PreviousCode = nil
+
 local function UpdateStatus(message)
+	if not LLRCA_StatusText then
+		return
+	end
 
-if not LLRCA_Status then
-return
-end
+	local total = State.total or 0
 
-local total=
+	local current = "-"
 
-State.total
-or
-0
+	local code = "-"
 
-local current="-"
+	local previous = "-"
 
-local code="-"
+	if total > 0 then
+		current = State.current
 
-local previous="-"
+		code = Codes[State.current] or "-"
 
-if total>0 then
+		previous = State.lastCode or "-"
+	end
 
-current=
-State.current
+	LLRCA_StatusText:SetText(message)
 
-code=
+	LLRCA_ProgressText:SetText(current .. " / " .. total)
 
-Codes[
-State.current
-]
+	LLRCA_NextCodeText:SetText(code)
 
-or
-"-"
+	LLRCA_LastCodeText:SetText(previous)
 
-previous=
+	--------------------------------------------------
+	-- COPY BUTTONS
+	--------------------------------------------------
 
-State.lastCode
+	LLRCA_CurrentCode = nil
+	LLRCA_PreviousCode = nil
 
-or
-"-"
+	if code ~= "-" then
+		LLRCA_CurrentCode = code
+	end
 
-end
+	if previous ~= "-" then
+		LLRCA_PreviousCode = previous
+	end
 
-local function ShortCode(text)
+	LLRCA_NextCopyButton:SetShown(LLRCA_CurrentCode ~= nil)
 
-if not text
-or
-text=="-"
-
-then
-
-return "-"
-
-end
-
-if string.len(
-text
-)<=32
-
-then
-
-return text
-
-end
-
-return
-
-string.sub(
-text,
-1,
-32
-)
-
-..
-"..."
-
-end
-
-LLRCA_Status:SetText(
-
-"Status: "
-..
-message
-
-..
-
-"\n\n"
-
-..
-
-"Code: "
-
-..
-
-current
-
-..
-
-"/"
-
-..
-
-total
-
-..
-
-"\n\n"
-
-..
-
-LLRCA_L_NEXT_CODE
-..
-":\n"
-
-..
-
-ShortCode(
-code
-)
-
-..
-
-"\n\n"
-
-..
-
-LLRCA_L_LAST_CODE
-..
-":\n"
-
-..
-
-ShortCode(
-previous
-)
-
-)
-
+	LLRCA_LastCopyButton:SetShown(LLRCA_PreviousCode ~= nil)
 end
 
 --------------------------------------------------
 -- GENERATION
 --------------------------------------------------
 
-local function Four()
-
-return string.format(
-"%04d",
-math.random(0,9999)
-)
-
-end
-
 local function GenerateCode()
+	local length = tonumber(LLRCA_DB.codeLength) or LLRCA_DEFAULTS.codeLength
 
-return
-Four()
-..Four()
-..Four()
-..Four()
-..Four()
-..Four()
-..math.random(0,9)
+	length = math.floor(length)
 
+	if length < 5 then
+		length = 5
+	elseif length > 50 then
+		length = 50
+	end
+
+	local code = {}
+
+	for i = 1, length do
+		code[i] = tostring(math.random(0, 9))
+	end
+
+	return table.concat(code)
 end
 
 local function GetNextUniqueCode()
+	while true do
+		local code = GenerateCode()
 
-while true do
+		if not UsedCodes[code] then
+			UsedCodes[code] = true
 
-local code=
-GenerateCode()
-
-if not UsedCodes[
-code
-]
-
-then
-
-UsedCodes[
-code
-]=true
-
-return code
-
-end
-
-end
-
+			return code
+		end
+	end
 end
 
 local function GenerateCodes()
+	wipe(Codes)
 
-wipe(
-Codes
-)
+	wipe(UsedCodes)
 
-wipe(
-UsedCodes
-)
+	State.current = 1
 
-State.current=1
+	local amount = tonumber(LLRCA_CountBox:GetText()) or LLRCA_DEFAULTS.codeCount
 
-local amount=
+	local length = tonumber(LLRCA_LengthBox:GetText()) or LLRCA_DEFAULTS.codeLength
 
-tonumber(
+	length = math.floor(length)
 
-LLRCA_CountBox:GetText()
+	if length < 5 then
+		length = 5
+	elseif length > 50 then
+		length = 50
+	end
 
-)
-or
-100
+	LLRCA_DB.codeCount = amount
+	LLRCA_DB.codeLength = length
 
-LLRCA_DB.codeCount=
-amount
+	State.total = amount
 
-State.total=
-amount
-
-Codes[1]=
-GetNextUniqueCode()
-
+	Codes[1] = GetNextUniqueCode()
 end
 
 --------------------------------------------------
 -- START
 --------------------------------------------------
 
-LLRCA_StartButton:SetScript(
+LLRCA_StartButton:SetScript("OnClick", function()
+	if not State.running then
+		GenerateCodes()
 
-"OnClick",
+		State.running = true
 
-function()
+		LLRCA_StartButton:SetText(LLRCA_L.STOP)
 
-if not State.running then
+		UpdateStatus(LLRCA_L.TALK)
+	else
+		State.running = false
 
-GenerateCodes()
+		wipe(Codes)
 
-State.running=true
+		State.current = 1
 
-LLRCA_StartButton:SetText(
-LLRCA_L.STOP
-)
+		LLRCA_StartButton:SetText(LLRCA_L.START)
 
-UpdateStatus(
-LLRCA_L.TALK
-)
-
-else
-
-State.running=false
-
-wipe(
-Codes
-)
-
-State.current=1
-
-LLRCA_StartButton:SetText(
-LLRCA_L.START
-)
-
-UpdateStatus(
-LLRCA_L.STOPPED
-)
-
-end
-
-end
-
-)
+		UpdateStatus(LLRCA_L.STOPPED)
+	end
+end)
 
 --------------------------------------------------
 -- GOSSIP
 --------------------------------------------------
 
-local frame=
-CreateFrame(
-"Frame"
-)
+local frame = CreateFrame("Frame")
 
-frame:RegisterEvent(
-"GOSSIP_SHOW"
-)
+frame:RegisterEvent("GOSSIP_SHOW")
 
-frame:SetScript(
+frame:SetScript("OnEvent", function()
+	if not State.running then
+		return
+	end
 
-"OnEvent",
+	local options = C_GossipInfo.GetOptions()
 
-function()
+	if not options then
+		return
+	end
 
-if not State.running then
-return
-end
+	for _, option in ipairs(options) do
+		local txt = string.lower(option.name or "")
 
-local options=
-C_GossipInfo.GetOptions()
+		local match = false
 
-if not options then
-return
-end
+		for _, entry in ipairs(LLRCA_DB.path) do
+			if string.find(txt, string.lower(entry)) then
+				match = true
 
-for _,
-option
-in ipairs(options)
+				break
+			end
+		end
 
-do
+		if match then
+			print("[STH] klick -> " .. txt)
 
-local txt=
-string.lower(
-option.name
-or
-""
-)
+			C_GossipInfo.SelectOption(option.gossipOptionID)
 
-local match=false
-
-for _,
-entry
-in ipairs(
-LLRCA_DB.path
-)
-
-do
-
-if string.find(
-txt,
-string.lower(
-entry
-)
-)
-
-then
-
-match=true
-
-break
-
-end
-
-end
-
-if match
-
-then
-
-print(
-"[STH] klick -> "
-..
-txt
-)
-
-C_GossipInfo.SelectOption(
-option.gossipOptionID
-)
-
-return
-
-end
-
-end
-
-end
-
-)
+			return
+		end
+	end
+end)
 
 --------------------------------------------------
 -- POPUP WATCHER
 --------------------------------------------------
 
-local watcher=
-CreateFrame(
-"Frame"
-)
+local watcher = CreateFrame("Frame")
 
-local waitingForAccept=false
+local waitingForAccept = false
 
-watcher:SetScript(
+watcher:SetScript("OnUpdate", function()
+	if not State.running then
+		return
+	end
 
-"OnUpdate",
+	if not StaticPopup1 then
+		return
+	end
 
-function()
+	--------------------------------------------------
+	-- OPEN
+	--------------------------------------------------
 
-if not State.running then
-return
-end
+	if StaticPopup1:IsShown() and not popupOpen then
+		popupOpen = true
 
-if not StaticPopup1 then
-return
-end
+		UpdateStatus(LLRCA_L.WAIT .. "...")
 
---------------------------------------------------
--- OPEN
---------------------------------------------------
+		if StaticPopup1EditBox then
+			local code = Codes[State.current]
 
-if StaticPopup1:IsShown()
+			StaticPopup1EditBox:SetText(code)
 
-and
-not popupOpen
+			UpdateStatus(LLRCA_L.WAIT .. "...")
 
-then
+			waitingForAccept = true
 
-popupOpen=true
+			C_Timer.After(0.5, function()
+				if not waitingForAccept then
+					return
+				end
 
-UpdateStatus(
-LLRCA_L.WAIT
-..
-"..."
-)
+				if not StaticPopup1 then
+					return
+				end
 
-if StaticPopup1EditBox then
+				if not StaticPopup1:IsShown() then
+					return
+				end
 
-local code=
+				if StaticPopup1Button1 and StaticPopup1Button1:IsVisible() and StaticPopup1Button1:IsEnabled() then
+					StaticPopup1Button1:Click()
+				end
+			end)
+		else
+		end
+	end
 
-Codes[
-State.current
-]
+	--------------------------------------------------
+	-- CLOSED
+	--------------------------------------------------
 
-StaticPopup1EditBox:SetText(
-code
-)
+	if popupOpen and not StaticPopup1:IsShown() then
+		popupOpen = false
+		waitingForAccept = false
 
-UpdateStatus(
-LLRCA_L.WAIT
-..
-"..."
-)
+		State.current = State.current + 1
 
-waitingForAccept=true
+		State.lastCode = Codes[State.current - 1]
 
-C_Timer.After(
+		if State.current <= (State.total or 0) then
+			Codes[State.current] = GetNextUniqueCode()
+		end
 
-0.5,
+		if State.current > (State.total or 0) then
+			State.running = false
 
-function()
+			wipe(Codes)
 
-if not waitingForAccept then
-return
-end
+			State.current = 1
 
-if not StaticPopup1 then
-return
-end
+			LLRCA_StartButton:SetText(LLRCA_L.START)
 
-if not StaticPopup1:IsShown() then
-return
-end
+			UpdateStatus(LLRCA_L.FINISHED)
 
-if StaticPopup1Button1
-and
-StaticPopup1Button1:IsVisible()
-and
-StaticPopup1Button1:IsEnabled()
+			return
+		end
 
-then
-
-StaticPopup1Button1:Click()
-
-end
-
-end
-
-)
-
-else
-
-end
-
-end
-
---------------------------------------------------
--- CLOSED
---------------------------------------------------
-
-if popupOpen
-and
-not StaticPopup1:IsShown()
-
-then
-
-popupOpen=false
-waitingForAccept=false
-
-State.current=
-State.current+1
-
-State.lastCode=
-
-Codes[
-State.current-1
-]
-
-if State.current
-<=
-(
-State.total
-or
-0
-)
-
-then
-
-Codes[
-State.current
-]=
-
-GetNextUniqueCode()
-
-end
-
-if State.current>
-(
-State.total
-or
-0
-)
-
-then
-
-State.running=false
-
-wipe(
-Codes
-)
-
-State.current=1
-
-LLRCA_StartButton:SetText(
-LLRCA_L.START
-)
-
-UpdateStatus(
-LLRCA_L.FINISHED
-)
-
-return
-
-end
-
-UpdateStatus(
-LLRCA_L.TALK
-)
-
-end
-
-end
-
-)
+		UpdateStatus(LLRCA_L.TALK)
+	end
+end)
 
 --------------------------------------------------
 -- SLASH
 --------------------------------------------------
 
-SLASH_STH1="/sth"
+SLASH_STH1 = "/sth"
 
-SlashCmdList.STH=function()
-
-print(
-Codes[
-State.current
-]
-or
-"none"
-)
-
+SlashCmdList.STH = function()
+	print(Codes[State.current] or "none")
 end
