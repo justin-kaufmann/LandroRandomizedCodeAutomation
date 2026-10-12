@@ -1,7 +1,7 @@
 # Landro Longshot Randomized Code Automation
 
 **Package version: 3.0.0**  
-**Dokumentation / Documentation: English + Deutsch**
+**Documentation / Dokumentation: English + Deutsch**
 
 ---
 
@@ -9,13 +9,19 @@
 
 ## What's new in 3.0.0
 
-- Centralize most visible UI labels, minimap tooltips, and workflow/status messages in `Localization.lua`.
-- Show German text when the WoW client locale is `deDE`; use English fallback text for other locales.
-- Update the documentation for the current modular UI and the German/English test workflow.
-- No intended changes to path learning, route traversal, code generation, popup confirmation, or iteration counting.
+Since the public v2.0.0 release, the addon has received substantial reliability improvements to menu learning and automatic navigation, plus German/English localization:
 
-The navigation-only “other actions” entry is recognized by its German and English wording. Its equivalent on other localized game clients may not be detected reliably.
+- **More reliable hierarchical menu learning:** the addon checks the active NPC dialogue against the selected route context and learned menu options, instead of relying on similar labels alone.
+- **Automatic navigation through “Other Actions”:** when the selected option is not visible on Landro's short product list, the addon can open the navigation-only “Other Actions” entry and continue. This entry is not saved as a route step.
+- **Safer route changes:** the latest selection takes priority when the user changes a path while an old code popup is closing. The old popup is not recorded as the endpoint for the newly selected route.
+- **Improved recovery:** when popup cancellation leaves no NPC dialogue open, the selected route remains queued so navigation can resume after Landro is opened again.
+- **More accurate endpoint detection:** a route is considered complete only after the actual key/code-entry popup is observed. An empty menu by itself is not enough, and a new path row is added only when a real submenu is found.
+- **No fixed 20-step path limit:** path rows and route handling can grow dynamically; practical limits still depend on the game client and available resources.
+- **Bug fix for menu-context normalization:** prevent the extra return value from Lua's `string.gsub` from being treated as a bogus path entry, which could make the learner skip a required menu click.
+- **German and English localization:** most visible UI labels, minimap tooltips, and key workflow/status messages are centralized in `Localization.lua`. The client locale `deDE` selects German; other locales use English text.
+- **Updated documentation:** installation, setup, the route-learning workflow, and troubleshooting have been refreshed.
 
+The navigation-only entry is recognized by its German and English wording. The equivalent wording on other localized game clients may not be detected reliably. A small number of diagnostic/runtime messages may also remain hard-coded.
 ## Overview
 
 Automates repetitive code-entry attempts at Landro Longshot in World of Warcraft. It learns the NPC dialogue path you select, automatically navigates the required menu options, generates non-repeating random numeric codes for each run (5–50 digits), enters and confirms each code, and tracks progress. You can configure the number of attempts (default: 100) and code length (default: 25). You must speak to Landro again between attempts; the addon does not start a new NPC interaction by itself. It generates random code guesses, not verified valid codes, so success is not guaranteed.
@@ -116,13 +122,19 @@ The addon stores configuration and learned menu data in the `LLRCA_DB` SavedVari
 
 ## Neu in Version 3.0.0
 
-- Die meisten sichtbaren UI-Beschriftungen, Minimap-Tooltips und Ablauf-/Statusmeldungen werden zentral über `Localization.lua` geladen.
-- Bei der WoW-Sprache `deDE` werden deutsche Texte verwendet; alle anderen Sprachcodes nutzen die englischen Fallback-Texte.
-- Die Dokumentation wurde an die modulare Benutzeroberfläche und den deutschen/englischen Test angepasst.
-- Keine beabsichtigten Änderungen am Pfadlernen, an der Navigation, Codegenerierung, Popup-Bestätigung oder Iterationszählung.
+Seit der öffentlich veröffentlichten Version v2.0.0 wurden die Menülernung und die automatische Navigation deutlich zuverlässiger gemacht. Hinzu kommt die deutsche und englische Lokalisierung:
 
-Die reine Navigationsoption „Weitere Aktionen“ wird anhand deutscher und englischer Formulierungen erkannt. Bei anderen Spielsprachen wird die entsprechende Menüoption möglicherweise nicht zuverlässig erkannt.
+- **Zuverlässigeres hierarchisches Menülernen:** Das Add-on gleicht den geöffneten NPC-Dialog mit dem ausgewählten Pfadkontext und den gelernten Menüoptionen ab, statt sich allein auf ähnliche Bezeichnungen zu verlassen.
+- **Automatische Navigation über „Weitere Aktionen“:** Ist der gewählte Menüpunkt auf Landros kurzer Produktliste nicht sichtbar, kann das Add-on die reine Navigationsoption öffnen und anschließend fortfahren. Diese Option wird nicht als Pfadschritt gespeichert.
+- **Sicherere Pfadänderungen:** Wenn während des Schließens eines alten Codefensters mehrere Pfadänderungen vorgenommen werden, hat die neueste Auswahl Vorrang. Das alte Popup wird nicht fälschlich als Endpunkt des neu gewählten Pfades gespeichert.
+- **Verbesserte Wiederaufnahme:** Ist nach dem Abbrechen eines Popups kein NPC-Dialog mehr geöffnet, bleibt der Lernauftrag vorgemerkt. Die Navigation kann fortgesetzt werden, sobald Landro wieder angesprochen wird.
+- **Genauere Endpunkterkennung:** Ein Pfad gilt erst dann als vollständig, wenn das tatsächliche Schlüssel-/Code-Eingabefenster erkannt wurde. Ein leeres Menü allein genügt nicht; ein weiterer Pfadschritt wird nur bei einem echten Untermenü angelegt.
+- **Keine feste Grenze von 20 Pfadschritten:** Pfadzeilen und Routenverwaltung wachsen dynamisch. Praktische Grenzen ergeben sich weiterhin aus dem Spielclient und den verfügbaren Ressourcen.
+- **Fehlerkorrektur bei der Menütext-Normalisierung:** Der zusätzliche Rückgabewert von Lua `string.gsub` wird nicht mehr versehentlich als ungültiger Pfadschritt interpretiert, wodurch zuvor ein notwendiger Menüklick übersprungen werden konnte.
+- **Deutsche und englische Lokalisierung:** Die meisten sichtbaren UI-Beschriftungen, Minimap-Tooltips und wichtigen Ablauf-/Statusmeldungen sind zentral in `Localization.lua` hinterlegt. Bei `deDE` werden deutsche Texte verwendet; andere Sprachcodes nutzen englische Texte.
+- **Aktualisierte Dokumentation:** Installation, Einrichtung, Ablauf des Menülernens und Fehlerbehebung wurden überarbeitet.
 
+Die reine Navigationsoption wird anhand deutscher und englischer Formulierungen erkannt. Bei anderen Spielsprachen wird die entsprechende Option möglicherweise nicht zuverlässig erkannt. Einige Diagnose-/Laufzeitmeldungen können weiterhin fest codiert sein.
 ## Überblick
 
 Automatisiert wiederholte Code-Eingaben bei Landro Longshot in World of Warcraft. Das Add-on lernt den von dir gewählten NPC-Dialogpfad, navigiert automatisch durch die benötigten Menüoptionen, erzeugt pro Durchlauf nicht wiederholte zufällige Zahlencodes (5–50 Stellen), trägt jeden Code ein, bestätigt die Eingabe und zeigt den Fortschritt an. Anzahl der Versuche (Standard: 100) und Codelänge (Standard: 25) sind einstellbar. Zwischen den Versuchen musst du Landro erneut ansprechen; das Add-on startet keine neue NPC-Interaktion von selbst. Es erzeugt zufällige Codeversuche, keine bestätigten gültigen Codes; ein Erfolg ist nicht garantiert.
