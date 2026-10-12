@@ -52,7 +52,7 @@ b.texture = tex
 -- INTERACTION
 --------------------------------------------------
 
-b:RegisterForClicks("AnyUp")
+b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 b:RegisterForDrag("LeftButton")
 
@@ -89,10 +89,9 @@ b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 b:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 
-	GameTooltip:AddLine("Landro Longshot Randomized Code Automation", 1, 0.82, 0)
-
-	GameTooltip:AddLine("|cff00ff00Click to open / close the addon window|r")
-
+	GameTooltip:AddLine(LLRCA_L.MAIN_TITLE .. " - " .. LLRCA_L.SUBTITLE, 1, 0.82, 0)
+	GameTooltip:AddLine(LLRCA_L.MINIMAP_TOOLTIP_LEFT_CLICK, 0.30, 1.00, 0.30)
+	GameTooltip:AddLine(LLRCA_L.MINIMAP_TOOLTIP_RIGHT_CLICK, 1.00, 0.82, 0.30)
 	GameTooltip:Show()
 end)
 
@@ -100,7 +99,17 @@ b:SetScript("OnLeave", function()
 	GameTooltip:Hide()
 end)
 
-b:SetScript("OnClick", function()
+b:SetScript("OnClick", function(_, button)
+	if button == "RightButton" then
+		-- Route the click through the same reset operation used by the old slash command.
+		if LLRCA_Core and LLRCA_Core.ResetLearning then
+			LLRCA_Core.ResetLearning()
+		else
+			print("[LLRCA] " .. LLRCA_L.MINIMAP_RESET_NOT_READY)
+		end
+		return
+	end
+
 	if LLRCA_Frame:IsShown() then
 		LLRCA_Frame:Hide()
 	else

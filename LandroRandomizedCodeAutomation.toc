@@ -1,12 +1,18 @@
 ## Interface: 120007
 ## Title: Landro Longshot Randomized Code Automation
 ## Author: Justin Kaufmann
-## Version: 1.0
-## Notes: Landro Longshot Redemption Assistant
+## Version: 3.0.0
+## Notes: Modular Landro menu learning, guarded route-context detection, automatic path traversal, endpoint detection, and repeated code-entry assistance.
 ## SavedVariables: LLRCA_DB
 
 Localization.lua
 Config.lua
-UI.lua
+UI/Frame.lua
+UI/PathConfig.lua
+UI/StatusPanel.lua
 Minimap.lua
-LandroRandomizedCodeAutomation.lua
+Core/State.lua
+Core/Start.lua
+Core/GossipLearning.lua
+Core/PopupWatcher.lua
+Core/Commands.lua
