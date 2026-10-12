@@ -108,33 +108,6 @@ The automatic detection of Landro’s navigation-only “other actions” option
 - **The addon does not resume from the open dialog:** Speak to Landro again or use the status instruction. Do not reset learning unless you intentionally want to discard the learned menu tree.
 - **You see a Lua error:** Save the complete error text, note the WoW client version and the action that triggered it, then report those details with the issue.
 
-## Release version metadata
-
-Before publishing this documentation as version **3.0.0**, make sure the source metadata also matches: set `## Version: 3.0.0` in `LandroRandomizedCodeAutomation.toc` and change the in-window label to `versionText:SetText("v3.0.0")` in `UI/StatusPanel.lua`. The uploaded source snapshot still contained `2.0.7` in both places at the time this documentation was prepared.
-
-## Source layout
-
-```text
-LandroRandomizedCodeAutomation/
-├── LandroRandomizedCodeAutomation.toc
-├── Localization.lua
-├── Config.lua
-├── Minimap.lua
-├── Core/
-│   ├── State.lua
-│   ├── Start.lua
-│   ├── GossipLearning.lua
-│   ├── PopupWatcher.lua
-│   └── Commands.lua
-├── UI/
-│   ├── Frame.lua
-│   ├── PathConfig.lua
-│   └── StatusPanel.lua
-├── README.md
-├── README.txt
-└── Changes.txt
-```
-
 The addon stores configuration and learned menu data in the `LLRCA_DB` SavedVariables table. Avoid manually editing the SavedVariables file while the game is running.
 
 ---
@@ -241,32 +214,5 @@ Die reine Navigationsoption „Weitere Aktionen“ wird anhand deutscher und eng
 - **Der Pfad wird nicht als vollständig erkannt:** Wähle die gewünschten Einträge der Reihe nach aus und prüfe, ob die letzte Auswahl wirklich Landros Schlüssel-/Code-Eingabefenster öffnet.
 - **Das Addon setzt den Pfad beim geöffneten Dialog nicht fort:** Sprich Landro erneut an oder folge der Statusanweisung. Setze die Lerninformationen nicht zurück, außer du möchtest den gesamten gelernten Menübaum bewusst verwerfen.
 - **Lua-Fehler:** Speichere den vollständigen Fehlertext, notiere WoW-Clientversion und die unmittelbar davor ausgeführte Aktion und gib diese Informationen zusammen mit dem Fehler weiter.
-
-## Versionsangabe für die Veröffentlichung
-
-Bevor diese Dokumentation als Version **3.0.0** veröffentlicht wird, müssen auch die Metadaten im Quellcode angepasst werden: Setze `## Version: 3.0.0` in `LandroRandomizedCodeAutomation.toc` und ändere die sichtbare UI-Zeile in `UI/StatusPanel.lua` auf `versionText:SetText("v3.0.0")`. Die hochgeladene Quellcodefassung enthielt an beiden Stellen beim Erstellen dieser Dokumentation noch `2.0.7`.
-
-## Quellcode-Struktur
-
-```text
-LandroRandomizedCodeAutomation/
-├── LandroRandomizedCodeAutomation.toc
-├── Localization.lua
-├── Config.lua
-├── Minimap.lua
-├── Core/
-│   ├── State.lua
-│   ├── Start.lua
-│   ├── GossipLearning.lua
-│   ├── PopupWatcher.lua
-│   └── Commands.lua
-├── UI/
-│   ├── Frame.lua
-│   ├── PathConfig.lua
-│   └── StatusPanel.lua
-├── README.md
-├── README.txt
-└── Changes.txt
-```
 
 Das Addon speichert Konfiguration und gelernte Menüinformationen in der SavedVariables-Tabelle `LLRCA_DB`. Bearbeite oder lösche die SavedVariables-Datei nicht manuell, während das Spiel läuft.
